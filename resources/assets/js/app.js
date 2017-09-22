@@ -1,9 +1,15 @@
 require('./bootstrap');
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {BrowserRouter as Router, Route} from 'react-router-dom';
 import Master from './components/Master';
-import Insert from './components/Insert';
-import View from './components/View';
+import {
+    HashRouter,
+    Route
+} from 'react-router-dom';
 
-ReactDOM.render(<Master/>, document.getElementById('app'));
+ReactDOM.render(
+    <HashRouter>
+        <Master/>
+    </HashRouter>,
+    document.getElementById('react-lara')
+);

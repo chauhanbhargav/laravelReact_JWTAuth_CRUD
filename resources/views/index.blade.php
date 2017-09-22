@@ -9,7 +9,7 @@
     <link href="{{asset('css/app.css')}}" rel="stylesheet" type="text/css">
 </head>
 <body>
-<div id="app"></div>
+<div id="react-lara"></div>
 <script src="{{asset('js/app.js')}}"></script>
 </body>
 </html>
