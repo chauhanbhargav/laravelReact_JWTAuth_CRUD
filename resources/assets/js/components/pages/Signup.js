@@ -11,7 +11,30 @@ class Signup extends React.Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            errorMessage: null,
+            isLoading: false
+        };
     }
+
+    handleSubmit(e) {
+        e.preventDefault();
+        console.log(this.props.form.getFieldsValue());
+    }
+
+    _renderMessage() {
+        if (this.state.errorMessage === null)
+            return null;
+        return (
+            <Row type="flex" align="center">
+                <Col span={4}>
+                    <Tag className="text-center" color="red">
+                        {this.state.errorMessage}
+                    </Tag>
+                </Col>
+            </Row>
+        )
+    };
 
     render() {
         const {getFieldDecorator} = this.props.form;
@@ -23,54 +46,62 @@ class Signup extends React.Component {
                             <h3>Signup</h3>
                         </div>
                     </nav>
-                    <div className="row">
-                        <div className="col-lg-6 col-lg-offset-3 text-center">
-                            <Form onSubmit={this.handleSubmit} className="login-form">
-                                <FormItem>
-                                    {getFieldDecorator('username', {
-                                        rules: [{required: true, message: 'Please input your username!'}]
-                                    })(
-                                        <Input placeholder="Username" className="form-control"/>
-                                    )}
-                                </FormItem>
-                                <br/>
-                                <FormItem>
-                                    {getFieldDecorator('email', {
-                                        rules: [{required: true, message: 'Please input your email!'}]
-                                    })(
-                                        <Input placeholder="Email" className="form-control"/>
-                                    )}
-                                </FormItem>
-                                <br/>
-                                <FormItem>
-                                    {getFieldDecorator('password', {
-                                        rules: [{required: true, message: 'Please input your Password!'}]
-                                    })(
-                                        <Input type="password"
-                                               placeholder="Password" className="form-control"/>
-                                    )}
-                                </FormItem>
-                                <br/>
-                                <FormItem>
-                                    {getFieldDecorator('password', {
-                                        rules: [{required: true, message: 'Please input your Confirm Password!'}]
-                                    })(
-                                        <Input type="confirmpassword" className="form-control"
-                                               placeholder="Confirm Password"/>
-                                    )}
-                                </FormItem>
-                                <br/>
-                                <FormItem>
+                    <Spin tip="Loading..." spinning={this.state.isLoading}>
+                        <div className="row">
+                            <div className="col-lg-6 col-lg-offset-3 text-center">
+                                <Form onSubmit={this.handleSubmit} className="login-form">
+                                    <FormItem>
+                                        {getFieldDecorator('username', {
+                                            rules: [{required: true, message: 'Please input your username!'}]
+                                        })(
+                                            <Input placeholder="Username" className="form-control"/>
+                                        )}
+                                    </FormItem>
                                     <br/>
-                                    <Button type="primary" htmlType="submit" className="btn btn-primary">Signup</Button>
-                                </FormItem>
-                                <FormItem>
+                                    <FormItem>
+                                        {getFieldDecorator('email', {
+                                            rules: [{required: true, message: 'Please input your email!'}]
+                                        })(
+                                            <Input placeholder="Email" className="form-control"/>
+                                        )}
+                                    </FormItem>
                                     <br/>
-                                    <Link to="/">Go To Login</Link>
-                                </FormItem>
-                            </Form>
+                                    <FormItem>
+                                        {getFieldDecorator('password', {
+                                            rules: [{
+                                                required: true, message: 'Please input your password!',
+                                            }],
+                                        })(
+                                            <Input type="password"
+                                                   placeholder="Password" className="form-control"/>
+                                        )}
+                                    </FormItem>
+                                    <br/>
+                                    <FormItem>
+                                        {getFieldDecorator('confirm', {
+                                            rules: [{
+                                                required: true, message: 'Please confirm your password!',
+                                            }],
+                                        })(
+                                            <Input type="password" className="form-control"
+                                                   placeholder="Confirm Password"/>
+                                        )}
+                                    </FormItem>
+                                    <br/>
+                                    <FormItem>
+                                        <br/>
+                                        <Button type="primary" htmlType="submit"
+                                                className="btn btn-primary">Signup</Button>
+                                    </FormItem>
+                                    <FormItem>
+                                        <br/>
+                                        <Link to="/">Go To Login</Link>
+                                    </FormItem>
+                                </Form>
+                            </div>
                         </div>
-                    </div>
+                        {this._renderMessage()}
+                    </Spin>
                 </div>
             </Content>
         )

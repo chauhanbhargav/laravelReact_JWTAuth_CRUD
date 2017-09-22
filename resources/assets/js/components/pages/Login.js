@@ -12,6 +12,11 @@ class Login extends React.Component {
         super(props);
     }
 
+    handleSubmit(e) {
+        e.preventDefault();
+        console.log(this.props.form.getFieldsValue());
+    }
+
     render() {
         const {getFieldDecorator} = this.props.form;
         return (
