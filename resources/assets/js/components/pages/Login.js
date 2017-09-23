@@ -1,86 +1,59 @@
 import React from 'react';
 import {
-    Form, Input, Tooltip,
-    Icon, Cascader, Select,
-    Row, Col, Checkbox,
-    Button, AutoComplete, Layout
+    Form, Input, Checkbox, Button,
+    Layout, Spin, notification
 } from 'antd';
 import {Link} from 'react-router-dom';
+
 const {Content} = Layout;
 const FormItem = Form.Item;
-const Option = Select.Option;
-const AutoCompleteOption = AutoComplete.Option;
-
-const residences = [{
-    value: 'zhejiang',
-    label: 'Zhejiang',
-    children: [{
-        value: 'hangzhou',
-        label: 'Hangzhou',
-        children: [{
-            value: 'xihu',
-            label: 'West Lake',
-        }],
-    }],
-}, {
-    value: 'jiangsu',
-    label: 'Jiangsu',
-    children: [{
-        value: 'nanjing',
-        label: 'Nanjing',
-        children: [{
-            value: 'zhonghuamen',
-            label: 'Zhong Hua Men',
-        }],
-    }],
-}];
+const loginNotification = (type, val, msg) => {
+    notification[type]({
+        message: val,
+        description: msg,
+    });
+};
 
 class Signup extends React.Component {
+    //  Default State
     state = {
         confirmDirty: false,
         autoCompleteResult: [],
+        isLoading: false,
+        errorMessage: null
     };
+
+    //  Login Submit
     handleSubmit = (e) => {
         e.preventDefault();
         this.props.form.validateFieldsAndScroll((err, values) => {
             if (!err) {
-                console.log('Received values of form: ', values);
+                let self = this;
+                this.setState({
+                    isLoading: true
+                });
+                let params = {
+                    emailId: this.props.form.getFieldValue("email"),
+                    password: this.props.form.getFieldValue("password")
+                };
+                axios.post('/api/login', params)
+                    .then(function (res) {
+                        self.setState({
+                            isLoading: false
+                        });
+                        if (res.data.meta.status === 'ok') {
+                            loginNotification('success', 'Success', res.data.meta.message);
+                        } else {
+                            loginNotification('error', 'Error', res.data.meta.message);
+                        }
+                    })
             }
         });
-    }
-    handleConfirmBlur = (e) => {
-        const value = e.target.value;
-        this.setState({confirmDirty: this.state.confirmDirty || !!value});
-    }
-    checkPassword = (rule, value, callback) => {
-        const form = this.props.form;
-        if (value && value !== form.getFieldValue('password')) {
-            callback('Two passwords that you enter is inconsistent!');
-        } else {
-            callback();
-        }
-    }
-    checkConfirm = (rule, value, callback) => {
-        const form = this.props.form;
-        if (value && this.state.confirmDirty) {
-            form.validateFields(['confirm'], {force: true});
-        }
-        callback();
-    }
+    };
 
-    handleWebsiteChange = (value) => {
-        let autoCompleteResult;
-        if (!value) {
-            autoCompleteResult = [];
-        } else {
-            autoCompleteResult = ['.com', '.org', '.net'].map(domain => `${value}${domain}`);
-        }
-        this.setState({autoCompleteResult});
-    }
 
     render() {
         const {getFieldDecorator} = this.props.form;
-        const {autoCompleteResult} = this.state;
 
         const formItemLayout = {
             labelCol: {
@@ -104,18 +77,6 @@ class Signup extends React.Component {
                 },
             },
         };
-        const prefixSelector = getFieldDecorator('prefix', {
-            initialValue: '86',
-        })(
-            <Select style={{width: 60}}>
-                <Option value="86">+86</Option>
-                <Option value="87">+87</Option>
-            </Select>
-        );
-
-        const websiteOptions = autoCompleteResult.map(website => (
-            <AutoCompleteOption key={website}>{website}</AutoCompleteOption>
-        ));
 
         return (
             <Content>
@@ -132,11 +93,11 @@ class Signup extends React.Component {
                                     {...formItemLayout}
                                     label="Email Id"
                                     hasFeedback>
-                                    {getFieldDecorator('nickname', {
+                                    {getFieldDecorator('email', {
                                         rules: [{
-                                            required: true,
-                                            message: 'Please input your E-mail!',
-                                            whitespace: true
+                                            type: 'email', message: 'The input is not valid E-mail!',
+                                        }, {
+                                            required: true, message: 'Please input your E-mail!',
                                         }],
                                     })(
                                         <Input />

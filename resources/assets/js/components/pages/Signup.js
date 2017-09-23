@@ -1,20 +1,21 @@
 import React from 'react';
 import {
     Form, Input, Tooltip,
-    Icon, Checkbox, Spin,
-    Button, Layout, Alert
+    Icon, Checkbox, Spin, AutoComplete,
+    Button, Layout, notification
 } from 'antd';
 import {Link} from 'react-router-dom';
-const {Content} = Layout;
 import axios from 'axios';
+
+const {Content} = Layout;
 const FormItem = Form.Item;
-
-
-//  Alert Close
-const onClose = function (e) {
-    console.log(e, 'I was closed.');
+const AutoCompleteOption = AutoComplete.Option;
+const signupNotification = (type) => {
+    notification[type]({
+        message: 'Registration Complete',
+        description: 'Thank you for registering with us.',
+    });
 };
-
 
 class Signup extends React.Component {
     //  Default State
@@ -31,7 +32,7 @@ class Signup extends React.Component {
         e.preventDefault();
         this.props.form.validateFieldsAndScroll((err, values) => {
             if (!err) {
-                var self = this;
+                let self = this;
                 this.setState({
                     isLoading: true
                 });
@@ -42,49 +43,29 @@ class Signup extends React.Component {
                 };
                 axios.post('/api/signup', params)
                     .then(function (res) {
+                        self.setState({
+                            isLoading: false
+                        });
                         if (res.data.meta.status === 'ok') {
-                            self.setState({
-                                isLoading: false,
-                                errorMessage: 200
+                            self.props.form.setFieldsValue({
+                                ["nickname"]: null,
                             });
+                            self.props.form.setFieldsValue({
+                                ["email"]: null,
+                            });
+                            self.props.form.setFieldsValue({
+                                ["password"]: null,
+                            });
+                            self.props.form.setFieldsValue({
+                                ["confirm"]: null,
+                            });
+                            signupNotification('success');
                         } else {
-                            self.setState({
-                                isLoading: false,
-                                errorMessage: 400
-                            });
+                            signupNotification('error');
                         }
-                        self._alertMessage();
                     })
             }
         });
-    };
-
-    //  Alert Message
-    _alertMessage = () => {
-        if (this.state.errorMessage === 400)
-            return (
-                <div>
-                    <Alert
-                        message="Server Error"
-                        description="Opppsss....Please try again !!"
-                        type="error"
-                        closable
-                        showIcon/>
-                </div>
-            );
-        else if (this.state.errorMessage === 200)
-            return (
-                <div>
-                    <Alert
-                        message="Register Successfully"
-                        description="Please login for enter to dashboard"
-                        type="success"
-                        closable
-                        showIcon/>
-                </div>
-            );
-        else
-            return null;
     };
 
     //  Confirm Password
@@ -116,6 +97,12 @@ class Signup extends React.Component {
     render() {
         const {getFieldDecorator} = this.props.form;
 
+        const {autoCompleteResult} = this.state;
+
+        const websiteOptions = autoCompleteResult.map(website => (
+            <AutoCompleteOption key={website}>{website}</AutoCompleteOption>
+        ));
+
         const formItemLayout = {
             labelCol: {
                 xs: {span: 24},
@@ -126,6 +113,7 @@ class Signup extends React.Component {
                 sm: {span: 14},
             },
         };
+
         const tailFormItemLayout = {
             wrapperCol: {
                 xs: {
@@ -150,18 +138,16 @@ class Signup extends React.Component {
                     <div className="row">
                         <Spin tip="Loading..." spinning={this.state.isLoading}>
                             <div className="col-lg-6 col-lg-offset-3 text-center">
-                                {this._alertMessage}
-                                <br/>
                                 <Form onSubmit={this.handleSubmit}>
                                     <FormItem
                                         {...formItemLayout}
                                         label={(
                                             <span>
-                                    Nickname&nbsp;
+                                            Nickname&nbsp;
                                                 <Tooltip title="What do you want other to call you?">
-                                                <Icon type="question-circle-o"/>
-                                            </Tooltip>
-                                     </span>
+                                                    <Icon type="question-circle-o"/>
+                                                </Tooltip>
+                                             </span>
                                         )}
                                         hasFeedback>
                                         {getFieldDecorator('nickname', {
