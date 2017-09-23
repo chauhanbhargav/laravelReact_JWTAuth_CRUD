@@ -3,8 +3,8 @@ import {
     Form, Input, Checkbox, Button,
     Layout, Spin, notification
 } from 'antd';
-import {Link} from 'react-router-dom';
-
+import {HashRouter, Router, Link} from 'react-router-dom';
+import Dashboard from './Dashboard';
 const {Content} = Layout;
 const FormItem = Form.Item;
 const loginNotification = (type, val, msg) => {
@@ -33,7 +33,7 @@ class Signup extends React.Component {
                     isLoading: true
                 });
                 let params = {
-                    emailId: this.props.form.getFieldValue("email"),
+                    email: this.props.form.getFieldValue("email"),
                     password: this.props.form.getFieldValue("password")
                 };
                 axios.post('/api/login', params)
@@ -43,6 +43,7 @@ class Signup extends React.Component {
                         });
                         if (res.data.meta.status === 'ok') {
                             loginNotification('success', 'Success', res.data.meta.message);
+                            self.props.history.push('/dashboard');
                         } else {
                             loginNotification('error', 'Error', res.data.meta.message);
                         }

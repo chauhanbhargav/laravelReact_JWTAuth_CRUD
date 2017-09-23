@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Traits\ApiResponse;
-use App\UserModel;
+use App\User;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -14,7 +14,7 @@ class UserController extends Controller
 
     public function signup(Request $request)
     {
-        $user = new UserModel();
+        $user = new User();
         $user->name = $request->userName;
         $user->email = $request->emailId;
         $user->password = bcrypt($request->password);
